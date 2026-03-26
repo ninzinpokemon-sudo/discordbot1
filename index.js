@@ -69,29 +69,6 @@ const searchAllMessages = async (channel, keyword, label) => {
 };
 
 
-// ===== 重複チェック（同一チャンネルのみ禁止） =====
-const isDuplicate = async (channel, content) => {
-  let lastId = null;
-
-  while (true) {
-    const options = { limit: 100 };
-    if (lastId) options.before = lastId;
-
-    const messages = await channel.messages.fetch(options);
-    if (messages.size === 0) break;
-
-    for (const msg of messages.values()) {
-      if (msg.content.includes(`内容: ${content}`)) {
-        return true;
-      }
-    }
-
-    lastId = messages.last().id;
-  }
-
-  return false;
-};
-
 
 // ===== メッセージ監視 =====
 client.on(Events.MessageCreate, async (message) => {
