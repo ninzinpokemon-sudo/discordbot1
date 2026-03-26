@@ -74,43 +74,29 @@ const searchAllMessages = async (channel, keyword, label) => {
 client.on(Events.MessageCreate, async (message) => {
   if (message.author.bot) return;
 
-  // ===== 理由入力処理 =====
-  if (waitingReason.has(message.author.id)) {
+ // ===== 理由入力処理 =====
+if (waitingReason.has(message.author.id)) {
 
-    const data = waitingReason.get(message.author.id);
-    waitingReason.delete(message.author.id);
+  const data = waitingReason.get(message.author.id);
+  waitingReason.delete(message.author.id);
 
-    const targetChannel = await client.channels.fetch(data.channelId);
+  const targetChannel = await client.channels.fetch(data.channelId);
 
-    // 重複チェック
-    const duplicate = await isDuplicate(targetChannel, data.content);
+  // ★そのまま登録
+  await targetChannel.send(
+    `📌メモ\n送信者: ${data.userTag}\n内容: ${data.content}\n理由: ${message.content}`
+  );
 
-    if (duplicate) {
-      const reply = await message.reply("⚠️ すでに登録されています");
+  const reply = await message.reply("登録しました");
 
-      setTimeout(() => {
-        message.delete().catch(() => {});
-        reply.delete().catch(() => {});
-      }, 3000);
+  // 理由＋返信削除
+  setTimeout(() => {
+    message.delete().catch(() => {});
+    reply.delete().catch(() => {});
+  }, 3000);
 
-      return;
-    }
-
-    await targetChannel.send(
-      `📌メモ\n送信者: ${data.userTag}\n内容: ${data.content}\n理由: ${message.content}`
-    );
-
-    const reply = await message.reply("登録しました");
-
-    // 理由＋返信削除
-    setTimeout(() => {
-      message.delete().catch(() => {});
-      reply.delete().catch(() => {});
-    }, 3000);
-
-    return;
-  }
-
+  return;
+}
   // ===== 罪状チャンネル =====
   if (message.channel.id === TARGET_CHANNEL_ID) {
 
