@@ -109,7 +109,7 @@ client.on(Events.MessageCreate, async (message) => {
       setTimeout(() => {
         message.delete().catch(() => {});
         reply.delete().catch(() => {});
-      }, 3000);
+      }, 60000);
 
       return;
     }
@@ -127,7 +127,7 @@ client.on(Events.MessageCreate, async (message) => {
       setTimeout(() => {
         message.delete().catch(() => {});
         reply.delete().catch(() => {});
-      }, 3000);
+      }, 60000);
 
       return;
     }
