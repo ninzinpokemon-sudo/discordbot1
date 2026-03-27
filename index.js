@@ -178,6 +178,7 @@ client.on(Events.MessageCreate, async (message) => {
 
 
 // ===== OCR専用チャンネル =====
+client.on("messageCreate", async (message) => {
 if (message.channel.id === OCR_CHANNEL_ID) {
 
   if (message.author.bot) return;
@@ -197,6 +198,7 @@ if (message.channel.id === OCR_CHANNEL_ID) {
 
   return; // 他の処理を止める
 }
+  });
 // ===== ボタン処理 =====
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isButton()) return;
