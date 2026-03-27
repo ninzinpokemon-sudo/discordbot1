@@ -189,7 +189,7 @@ async function extractTextFromImage(imageUrl) {
         requests: [
           {
             image: { source: { imageUri: imageUrl } },
-            features: [{ type: "DOCUMENT_TEXT_DETECTION" }]
+            features: [{ type: "TEXT_DETECTION" }]
           }
         ]
       })
