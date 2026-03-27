@@ -189,7 +189,7 @@ async function extractTextFromImage(imageUrl) {
         requests: [
           {
             image: { source: { imageUri: imageUrl } },
-            features: [{ type: "TEXT_DETECTION" }]
+            features: [{ type: "DOCUMENT_TEXT_DETECTION" }]
           }
         ]
       })
@@ -212,7 +212,7 @@ if (message.channel.id === OCR_CHANNEL_ID) {
   try {
     const text = await extractTextFromImage(attachment.url);
 
-    await message.reply(📄 OCR結果:\n${text});
+    await message.reply(`📄 OCR結果:\n${text}`);
 
   } catch (err) {
     console.error(err);
