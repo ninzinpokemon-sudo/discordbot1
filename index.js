@@ -189,13 +189,17 @@ async function extractTextFromImage(imageUrl) {
         requests: [
           {
             image: { source: { imageUri: imageUrl } },
-            features: [{ type: "TEXT_DETECTION" }]
+            features: [{ type: "DOCUMENT_TEXT_DETECTION" }]
+               }
+            ],
+            imageContext: {
+              languageHints: ["ko"]
+            }
           }
         ]
       })
     }
   );
-
   const data = await response.json();
 
   return data.responses?.[0]?.fullTextAnnotation?.text || "文字を読み取れませんでした";
