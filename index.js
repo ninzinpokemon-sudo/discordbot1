@@ -179,42 +179,23 @@ client.on(Events.MessageCreate, async (message) => {
 
 // ===== OCR専用チャンネル =====
 
-
 async function extractTextFromImage(imageUrl) {
   const response = await fetch(
-    `https://vision.googleapis.com/v1/images:annotate?key=${process.env.VISION_API_KEY}`,
+    https://vision.googleapis.com/v1/images:annotate?key=${process.env.VISION_API_KEY},
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         requests: [
           {
-            image: {
-              source: { imageUri: imageUrl }
-            },
-            features: [
-              {
-                type: "DOCUMENT_TEXT_DETECTION"
-              }
-            ],
-            imageContext: {
-              languageHints: ["ko"]
-            }
+            image: { source: { imageUri: imageUrl } },
+            features: [{ type: "TEXT_DETECTION" }]
           }
         ]
       })
     }
   );
 
-  const data = await response.json();
-
-  const text =
-    data.responses?.[0]?.fullTextAnnotation?.text ||
-    data.responses?.[0]?.textAnnotations?.[0]?.description ||
-    "";
-
-  return text.trim() || "文字を読み取れませんでした";
-}
   const data = await response.json();
 
   return data.responses?.[0]?.fullTextAnnotation?.text || "文字を読み取れませんでした";
@@ -231,7 +212,7 @@ if (message.channel.id === OCR_CHANNEL_ID) {
   try {
     const text = await extractTextFromImage(attachment.url);
 
-    await message.reply(`📄 OCR結果:\n${text}`);
+    await message.reply(📄 OCR結果:\n${text});
 
   } catch (err) {
     console.error(err);
