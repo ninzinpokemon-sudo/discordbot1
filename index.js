@@ -189,14 +189,32 @@ async function extractTextFromImage(imageUrl) {
       body: JSON.stringify({
         requests: [
           {
-            image: { source: { imageUri: imageUrl } },
-            features: [{ type: "TEXT_DETECTION" }]
+            image: {
+              source: { imageUri: imageUrl }
+            },
+            features: [
+              {
+                type: "DOCUMENT_TEXT_DETECTION"
+              }
+            ],
+            imageContext: {
+              languageHints: ["ko"]
+            }
           }
         ]
       })
     }
   );
 
+  const data = await response.json();
+
+  const text =
+    data.responses?.[0]?.fullTextAnnotation?.text ||
+    data.responses?.[0]?.textAnnotations?.[0]?.description ||
+    "";
+
+  return text.trim() || "文字を読み取れませんでした";
+}
   const data = await response.json();
 
   return data.responses?.[0]?.fullTextAnnotation?.text || "文字を読み取れませんでした";
