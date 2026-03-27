@@ -176,6 +176,27 @@ client.on(Events.MessageCreate, async (message) => {
   }
 });
 
+
+// ===== OCR専用チャンネル =====
+if (message.channel.id === OCR_CHANNEL_ID) {
+
+  if (message.author.bot) return;
+  if (message.attachments.size === 0) return;
+
+  const attachment = message.attachments.first();
+
+  try {
+    const text = await extractTextFromImage(attachment.url);
+
+    await message.reply(`📄 OCR結果:\n${text}`);
+
+  } catch (err) {
+    console.error(err);
+    await message.reply("❌ OCRエラーが発生しました");
+  }
+
+  return; // 他の処理を止める
+}
 // ===== ボタン処理 =====
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isButton()) return;
@@ -210,26 +231,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
     ephemeral: true
   });
 });
-
-  // ===== OCR専用チャンネル =====
-  if (message.channel.id === OCR_CHANNEL_ID) {
-
-    if (message.attachments.size === 0) return;
-
-    const attachment = message.attachments.first();
-
-    try {
-      const text = await extractTextFromImage(attachment.url);
-
-      await message.reply(`📄 OCR結果:\n${text}`);
-
-    } catch (err) {
-      console.error(err);
-      await message.reply("❌ OCRエラーが発生しました");
-    }
-
-    return; // ★他の処理に影響させない
-  }
 
 // ===== ログイン =====
 client.login(TOKEN);
