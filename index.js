@@ -181,7 +181,7 @@ client.on(Events.MessageCreate, async (message) => {
 
 async function extractTextFromImage(imageUrl) {
   const response = await fetch(
-    https://vision.googleapis.com/v1/images:annotate?key=${process.env.VISION_API_KEY},
+    `https://vision.googleapis.com/v1/images:annotate?key=${process.env.VISION_API_KEY}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -190,16 +190,12 @@ async function extractTextFromImage(imageUrl) {
           {
             image: { source: { imageUri: imageUrl } },
             features: [{ type: "DOCUMENT_TEXT_DETECTION" }]
-               }
-            ],
-            imageContext: {
-              languageHints: ["ko"]
-            }
           }
         ]
       })
     }
   );
+
   const data = await response.json();
 
   return data.responses?.[0]?.fullTextAnnotation?.text || "文字を読み取れませんでした";
