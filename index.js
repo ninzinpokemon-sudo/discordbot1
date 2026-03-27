@@ -35,7 +35,7 @@ client.once(Events.ClientReady, () => {
 // ===== 理由待ち =====
 const waitingReason = new Map();
 
-// ===== 無限検索（複数対応＋理由抽出） =====
+// ===== 無限検索 =====
 const searchAllMessages = async (channel, keyword, label) => {
   let lastId = null;
   let results = [];
@@ -66,29 +66,6 @@ const searchAllMessages = async (channel, keyword, label) => {
   return results;
 };
 
-// ===== 重複チェック（同一チャンネルのみ禁止） =====
-const isDuplicate = async (channel, content) => {
-  let lastId = null;
-
-  while (true) {
-    const options = { limit: 100 };
-    if (lastId) options.before = lastId;
-
-    const messages = await channel.messages.fetch(options);
-    if (messages.size === 0) break;
-
-    for (const msg of messages.values()) {
-      if (msg.content.includes(`内容: ${content}`)) {
-        return true;
-      }
-    }
-
-    lastId = messages.last().id;
-  }
-
-  return false;
-};
-
 // ===== メッセージ監視 =====
 client.on(Events.MessageCreate, async (message) => {
   if (message.author.bot) return;
@@ -98,7 +75,6 @@ client.on(Events.MessageCreate, async (message) => {
 
     const data = waitingReason.get(message.author.id);
 
-    // ★1分制限
     const LIMIT = 1 * 60 * 1000;
 
     if (Date.now() - data.time > LIMIT) {
@@ -118,30 +94,18 @@ client.on(Events.MessageCreate, async (message) => {
 
     const targetChannel = await client.channels.fetch(data.channelId);
 
-    // 重複チェック
-    const duplicate = await isDuplicate(targetChannel, data.content);
-
-    if (duplicate) {
-      const reply = await message.reply("⚠️ すでに登録されています");
-
-      setTimeout(() => {
-        message.delete().catch(() => {});
-        reply.delete().catch(() => {});
-      }, 60000);
-
-      return;
-    }
-
+    // ★重複チェック削除（そのまま登録）
     await targetChannel.send(
       `📌メモ\n送信者: ${data.userTag}\n内容: ${data.content}\n理由: ${message.content}`
     );
 
-    const reply = await message.reply("登録しました");
+    // ★成功メッセージ変更
+    const reply = await message.reply("登録を完了しました");
 
     setTimeout(() => {
       message.delete().catch(() => {});
       reply.delete().catch(() => {});
-    }, 3000);
+    }, 60000);
 
     return;
   }
@@ -178,7 +142,7 @@ client.on(Events.MessageCreate, async (message) => {
 
     setTimeout(() => {
       message.delete().catch(() => {});
-    }, 3000);
+    }, 60000);
   }
 
   // ===== 確認チャンネル =====
@@ -233,7 +197,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
   if (type === "abuse") channelId = ABUSE_CHANNEL_ID;
   if (type === "build") channelId = BUILD_CHANNEL_ID;
 
-  // ★時間付きで登録
   waitingReason.set(interaction.user.id, {
     content: originalMessage.content,
     channelId: channelId,
