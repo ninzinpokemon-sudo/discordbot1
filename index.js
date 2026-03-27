@@ -179,7 +179,6 @@ client.on(Events.MessageCreate, async (message) => {
 
 // ===== OCR専用チャンネル =====
 
-const fetch = require("node-fetch");
 
 async function extractTextFromImage(imageUrl) {
   const response = await fetch(
