@@ -178,6 +178,31 @@ client.on(Events.MessageCreate, async (message) => {
 
 
 // ===== OCR専用チャンネル =====
+
+const fetch = require("node-fetch");
+
+async function extractTextFromImage(imageUrl) {
+  const response = await fetch(
+    `https://vision.googleapis.com/v1/images:annotate?key=${process.env.VISION_API_KEY}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        requests: [
+          {
+            image: { source: { imageUri: imageUrl } },
+            features: [{ type: "TEXT_DETECTION" }]
+          }
+        ]
+      })
+    }
+  );
+
+  const data = await response.json();
+
+  return data.responses?.[0]?.fullTextAnnotation?.text || "文字を読み取れませんでした";
+}
+
 client.on("messageCreate", async (message) => {
 if (message.channel.id === OCR_CHANNEL_ID) {
 
