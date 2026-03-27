@@ -18,6 +18,7 @@ const CHECK_CHANNEL_ID = "1486830026623156497";
 const SKILL_CHANNEL_ID = "1486824346843611236";
 const ABUSE_CHANNEL_ID = "1486824403462258708";
 const BUILD_CHANNEL_ID = "1486824419333509301";
+const OCR_CHANNEL_ID = "1486947934342873219";
 
 // ===== Bot =====
 const client = new Client({
@@ -209,6 +210,26 @@ client.on(Events.InteractionCreate, async (interaction) => {
     ephemeral: true
   });
 });
+
+  // ===== OCR専用チャンネル =====
+  if (message.channel.id === OCR_CHANNEL_ID) {
+
+    if (message.attachments.size === 0) return;
+
+    const attachment = message.attachments.first();
+
+    try {
+      const text = await extractTextFromImage(attachment.url);
+
+      await message.reply(`📄 OCR結果:\n${text}`);
+
+    } catch (err) {
+      console.error(err);
+      await message.reply("❌ OCRエラーが発生しました");
+    }
+
+    return; // ★他の処理に影響させない
+  }
 
 // ===== ログイン =====
 client.login(TOKEN);
